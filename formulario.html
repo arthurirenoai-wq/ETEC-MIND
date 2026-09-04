@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatar Dificuldade - Aluno</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f4f6f8; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 20px; 
+        }
+        .container { 
+            background: #fff; 
+            padding: 40px 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08); 
+            width: 100%; 
+            max-width: 500px; 
+            text-align: center;
+        }
+        
+        /* Sistema de Telas (Passo a passo) */
+        .step { display: none; animation: fadeIn 0.4s ease; }
+        .step.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { color: #1a1a1a; margin-bottom: 10px; font-size: 24px; }
+        p { color: #666; margin-bottom: 25px; font-size: 15px; }
+        
+        form { text-align: left; }
+        label { display: block; font-weight: 600; margin: 15px 0 5px; color: #444; }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ccc; 
+            border-radius: 8px; 
+            font-size: 15px; 
+            background-color: #fafafa;
+        }
+        input:focus, select:focus, textarea:focus { border-color: #0056b3; outline: none; background: #fff;}
+        
+        .btn-container { display: flex; flex-direction: column; gap: 10px; margin-top: 25px; }
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background: #0056b3; 
+            color: #fff; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold; 
+            transition: 0.2s;
+        }
+        button:hover { background: #004494; }
+        
+        button.btn-outline { background: transparent; color: #0056b3; border: 2px solid #0056b3; }
+        button.btn-outline:hover { background: #f0f7ff; }
+        
+        button.btn-voltar { background: transparent; color: #888; font-size: 14px; padding: 10px; font-weight: normal; margin-top: 5px; }
+        button.btn-voltar:hover { color: #333; text-decoration: underline; background: transparent; }
+    </style>
+</head>
+<body>
+
+    <main class="container">
+        
+        <!-- ================= TELA 1: ESCOLHA DE IDENTIFICAÇÃO ================= -->
+        <div id="step-escolha" class="step active">
+            <h2>Como deseja participar?</h2>
+            <p>Você pode enviar sua dificuldade anonimamente ou se identificar para a coordenação.</p>
+            
+            <div class="btn-container">
+                <button onclick="escolherModo(false)">Quero me identificar</button>
+                <button class="btn-outline" onclick="escolherModo(true)">Continuar anonimamente</button>
+            </div>
+        </div>
+
+        <!-- ================= TELA 2: INFORMAR NOME ================= -->
+        <div id="step-identificacao" class="step">
+            <h2>Sua Identificação</h2>
+            <p>Preencha seu nome para a coordenação saber quem você é.</p>
+            
+            <div style="text-align: left;">
+                <label>Nome Completo</label>
+                <input type="text" id="nome_aluno" placeholder="Digite seu nome">
+            </div>
+
+            <div class="btn-container">
+                <button onclick="avancarParaRelato()">Continuar para o Relato</button>
+                <button class="btn-voltar" onclick="irParaTela('step-escolha')">Voltar</button>
+            </div>
+        </div>
+
+        <!-- ================= TELA 3: FORMULÁRIO DE RELATO ================= -->
+        <div id="step-relato" class="step">
+            <h2>Detalhes da Dificuldade</h2>
+            <p>Conte para nós o que está acontecendo.</p>
+
+            <form id="form-aluno" onsubmit="enviarParaCoordenacao(event)">
+                <label>Matéria</label>
+                <select id="materia" required>
+                    <option value="" disabled selected>Selecione...</option>
+                    <option value="Matemática">Matemática</option>
+                    <option value="Português">Português</option>
+                    <option value="História">História</option>
+                    <option value="Geografia">Geografia</option>
+                    <option value="Desenvolvimento de Sistemas">Desenvolvimento de Sistemas</option>
+                </select>
+
+                <label>Nível de Dificuldade</label>
+                <select id="nivel" required>
+                    <option value="" disabled selected>Selecione...</option>
+                    <option value="Baixa">Baixa</option>
+                    <option value="Média">Média</option>
+                    <option value="Alta">Alta</option>
+                </select>
+
+                <label>Conte um pouco mais</label>
+                <textarea id="detalhes" rows="4" required placeholder="Explique sua dificuldade..."></textarea>
+
+                <div class="btn-container">
+                    <button type="submit">Enviar para Coordenação</button>
+                    <button type="button" class="btn-voltar" onclick="voltarDoRelato()">Voltar</button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+
+    <script>
+        let isAnonimo = true;
+
+        // Função genérica para trocar as telas
+        function irParaTela(telaId) {
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            document.getElementById(telaId).classList.add('active');
+        }
+
+        // Quando o aluno clica na Tela 1
+        function escolherModo(anonimo) {
+            isAnonimo = anonimo;
+            if (anonimo) {
+                document.getElementById('nome_aluno').value = ""; // Limpa o nome
+                irParaTela('step-relato'); // Pula a tela de identificação
+            } else {
+                irParaTela('step-identificacao'); // Vai para a tela de nome
+            }
+        }
+
+        // Quando o aluno clica "Continuar" na Tela 2
+        function avancarParaRelato() {
+            const nome = document.getElementById('nome_aluno').value.trim();
+            if (nome === "") {
+                alert("Por favor, digite seu nome ou volte e escolha continuar anonimamente.");
+                return;
+            }
+            irParaTela('step-relato');
+        }
+
+        // Botão voltar da Tela 3
+        function voltarDoRelato() {
+            if (isAnonimo) {
+                irParaTela('step-escolha');
+            } else {
+                irParaTela('step-identificacao');
+            }
+        }
+
+        // Envio final para a Coordenação em tempo real
+        function enviarParaCoordenacao(event) {
+            event.preventDefault(); // Impede o F5 da página
+
+            // Coleta o nome, se for anônimo, envia a palavra "Anônimo"
+            let nomeFinal = isAnonimo ? "Anônimo" : document.getElementById('nome_aluno').value;
+
+            // Monta o objeto com os dados
+            const novoRelato = {
+                id: Date.now(),
+                data: new Date().toLocaleString('pt-BR'),
+                nome: nomeFinal,
+                materia: document.getElementById('materia').value,
+                nivel: document.getElementById('nivel').value,
+                detalhes: document.getElementById('detalhes').value
+            };
+
+            // Salva no LocalStorage do Navegador
+            let relatosSalvos = JSON.parse(localStorage.getItem('bancoDeDadosRelatos')) || [];
+            relatosSalvos.push(novoRelato);
+            localStorage.setItem('bancoDeDadosRelatos', JSON.stringify(relatosSalvos));
+
+            // Alerta de sucesso
+            alert("Muito obrigado! Seu relato foi enviado para a coordenação em tempo real.");
+            
+            // Reseta tudo e volta para o início
+            document.getElementById('form-aluno').reset();
+            document.getElementById('nome_aluno').value = "";
+            irParaTela('step-escolha');
+        }
+    </script>
+</body>
+</html>
