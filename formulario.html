@@ -6,63 +6,22 @@
     <title>Relatar Dificuldade - Aluno</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: #f4f6f8; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            padding: 20px; 
-        }
-        .container { 
-            background: #fff; 
-            padding: 40px 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08); 
-            width: 100%; 
-            max-width: 500px; 
-            text-align: center;
-        }
-        
-        /* Sistema de Telas (Passo a passo) */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f8; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background: #fff; padding: 40px 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); width: 100%; max-width: 500px; text-align: center; }
         .step { display: none; animation: fadeIn 0.4s ease; }
         .step.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
         h2 { color: #1a1a1a; margin-bottom: 10px; font-size: 24px; }
         p { color: #666; margin-bottom: 25px; font-size: 15px; }
-        
         form { text-align: left; }
         label { display: block; font-weight: 600; margin: 15px 0 5px; color: #444; }
-        input, select, textarea { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1px solid #ccc; 
-            border-radius: 8px; 
-            font-size: 15px; 
-            background-color: #fafafa;
-        }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; background-color: #fafafa; }
         input:focus, select:focus, textarea:focus { border-color: #0056b3; outline: none; background: #fff;}
-        
         .btn-container { display: flex; flex-direction: column; gap: 10px; margin-top: 25px; }
-        button { 
-            width: 100%; 
-            padding: 14px; 
-            background: #0056b3; 
-            color: #fff; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: bold; 
-            transition: 0.2s;
-        }
+        button { width: 100%; padding: 14px; background: #0056b3; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.2s; }
         button:hover { background: #004494; }
-        
         button.btn-outline { background: transparent; color: #0056b3; border: 2px solid #0056b3; }
         button.btn-outline:hover { background: #f0f7ff; }
-        
         button.btn-voltar { background: transparent; color: #888; font-size: 14px; padding: 10px; font-weight: normal; margin-top: 5px; }
         button.btn-voltar:hover { color: #333; text-decoration: underline; background: transparent; }
     </style>
@@ -71,57 +30,46 @@
 
     <main class="container">
         
-        <!-- ================= TELA 1: ESCOLHA DE IDENTIFICAÇÃO ================= -->
         <div id="step-escolha" class="step active">
             <h2>Como deseja participar?</h2>
             <p>Você pode enviar sua dificuldade anonimamente ou se identificar para a coordenação.</p>
-            
             <div class="btn-container">
                 <button onclick="escolherModo(false)">Quero me identificar</button>
                 <button class="btn-outline" onclick="escolherModo(true)">Continuar anonimamente</button>
             </div>
         </div>
 
-        <!-- ================= TELA 2: INFORMAR NOME E EMAIL ================= -->
         <div id="step-identificacao" class="step">
             <h2>Sua Identificação</h2>
             <p>Preencha seus dados para a coordenação saber quem você é.</p>
-            
             <div style="text-align: left;">
                 <label>Nome Completo</label>
                 <input type="text" id="nome_aluno" placeholder="Digite seu nome">
-
                 <label>E-mail</label>
                 <input type="email" id="email_aluno" placeholder="Digite seu e-mail de contato">
             </div>
-
             <div class="btn-container">
                 <button onclick="avancarParaRelato(false)">Continuar para o Relato</button>
                 <button class="btn-voltar" onclick="irParaTela('step-escolha')">Voltar</button>
             </div>
         </div>
 
-        <!-- ================= TELA 2B: MODO ANÔNIMO ================= -->
         <div id="step-anonimo" class="step">
             <h2>Modo Anônimo</h2>
             <p>Seu nome não será revelado. Se quiser receber um retorno, deixe seu e-mail institucional (opcional).</p>
-            
             <div style="text-align: left;">
                 <label>E-mail Institucional (Opcional)</label>
                 <input type="email" id="email_anonimo" placeholder="nome.sobrenome@etec.sp.gov.br">
             </div>
-
             <div class="btn-container">
                 <button onclick="avancarParaRelato(true)">Continuar para o Relato</button>
                 <button class="btn-voltar" onclick="irParaTela('step-escolha')">Voltar</button>
             </div>
         </div>
 
-        <!-- ================= TELA 3: FORMULÁRIO DE RELATO ================= -->
         <div id="step-relato" class="step">
             <h2>Detalhes da Dificuldade</h2>
             <p>Conte para nós o que está acontecendo.</p>
-
             <form id="form-aluno" onsubmit="enviarParaCoordenacao(event)">
                 <label>Matéria</label>
                 <select id="materia" required>
@@ -130,11 +78,11 @@
                     <option value="Português">Português</option>
                     <option value="História">História</option>
                     <option value="Geografia">Geografia</option>
-                    <option value="Biologia">Biologia </option>
-                    <option value="Física">Física </option>
-                    <option value="Química">Química </option>
-                    <option value="Inglês">Inglês </option>
-                    <option value="Biologia">Biologia </option>
+                    <option value="Biologia">Biologia</option>
+                    <option value="Física">Física</option>
+                    <option value="Química">Química</option>
+                    <option value="Inglês">Inglês</option>
+                    <option value="Desenvolvimento de Sistemas">Desenvolvimento de Sistemas</option>
                 </select>
 
                 <label>Nível de Dificuldade</label>
@@ -149,7 +97,7 @@
                 <textarea id="detalhes" rows="4" required placeholder="Explique sua dificuldade..."></textarea>
 
                 <div class="btn-container">
-                    <button type="submit">Enviar para Coordenação</button>
+                    <button type="submit" id="btn-enviar">Enviar para Coordenação</button>
                     <button type="button" class="btn-voltar" onclick="voltarDoRelato()">Voltar</button>
                 </div>
             </form>
@@ -160,39 +108,35 @@
     <script>
         let isAnonimo = true;
 
-        // Função genérica para trocar as telas
         function irParaTela(telaId) {
             document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
             document.getElementById(telaId).classList.add('active');
         }
 
-        // Quando o aluno clica na Tela 1
         function escolherModo(anonimo) {
             isAnonimo = anonimo;
             if (anonimo) {
                 document.getElementById('nome_aluno').value = ""; 
                 document.getElementById('email_aluno').value = ""; 
-                irParaTela('step-anonimo'); // Vai para a tela de email opcional
+                irParaTela('step-anonimo');
             } else {
                 document.getElementById('email_anonimo').value = ""; 
-                irParaTela('step-identificacao'); // Vai para a tela de identificacao completa
+                irParaTela('step-identificacao');
             }
         }
 
-        // Quando o aluno clica "Continuar" nas telas de identificação
         function avancarParaRelato(modoAnonimo) {
             if (!modoAnonimo) {
                 const nome = document.getElementById('nome_aluno').value.trim();
                 const email = document.getElementById('email_aluno').value.trim();
                 if (nome === "" || email === "") {
-                    alert("Por favor, preencha seu nome e e-mail ou volte e escolha continuar anonimamente.");
+                    alert("Por favor, preencha seu nome e e-mail.");
                     return;
                 }
             }
             irParaTela('step-relato');
         }
 
-        // Botão voltar da Tela 3
         function voltarDoRelato() {
             if (isAnonimo) {
                 irParaTela('step-anonimo');
@@ -201,42 +145,46 @@
             }
         }
 
-        // Envio final para a Coordenação em tempo real
+        // COMUNICAÇÃO COM O PYTHON
         function enviarParaCoordenacao(event) {
-            event.preventDefault(); // Impede o F5 da página
+            event.preventDefault(); 
+            const btnEnviar = document.getElementById('btn-enviar');
+            btnEnviar.innerText = "Enviando...";
+            btnEnviar.disabled = true;
 
-            // Coleta o nome, se for anônimo, envia a palavra "Anônimo"
             let nomeFinal = isAnonimo ? "Anônimo" : document.getElementById('nome_aluno').value;
-            
-            // Coleta o e-mail correto baseado na escolha
             let emailFinal = isAnonimo ? document.getElementById('email_anonimo').value : document.getElementById('email_aluno').value;
 
-            // Monta o objeto com os dados
             const novoRelato = {
-                id: Date.now(),
-                data: new Date().toLocaleString('pt-BR'),
                 nome: nomeFinal,
-                email: emailFinal || "Não informado", // Adiciona o email ou um texto padrão
+                email: emailFinal || "Não informado",
                 materia: document.getElementById('materia').value,
                 nivel: document.getElementById('nivel').value,
-                detalhes: document.getElementById('detalhes').value,
-                status: 'Pendente'
+                detalhes: document.getElementById('detalhes').value
             };
 
-            // Salva no LocalStorage do Navegador
-            let relatosSalvos = JSON.parse(localStorage.getItem('bancoDeDadosRelatos')) || [];
-            relatosSalvos.push(novoRelato);
-            localStorage.setItem('bancoDeDadosRelatos', JSON.stringify(relatosSalvos));
-
-            // Alerta de sucesso
-            alert("Muito obrigado! Seu relato foi enviado para a coordenação em tempo real.");
-            
-            // Reseta tudo e volta para o início
-            document.getElementById('form-aluno').reset();
-            document.getElementById('nome_aluno').value = "";
-            document.getElementById('email_aluno').value = "";
-            document.getElementById('email_anonimo').value = "";
-            irParaTela('step-escolha');
+            // Envia os dados para a rota /api/salvar do Python
+            fetch('/api/salvar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(novoRelato)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("Muito obrigado! Seu relato foi enviado para a coordenação.");
+                document.getElementById('form-aluno').reset();
+                document.getElementById('nome_aluno').value = "";
+                document.getElementById('email_aluno').value = "";
+                document.getElementById('email_anonimo').value = "";
+                irParaTela('step-escolha');
+            })
+            .catch(error => {
+                alert("Erro ao conectar com o servidor.");
+            })
+            .finally(() => {
+                btnEnviar.innerText = "Enviar para Coordenação";
+                btnEnviar.disabled = false;
+            });
         }
     </script>
 </body>
