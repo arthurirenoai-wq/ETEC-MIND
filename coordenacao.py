@@ -7,6 +7,28 @@ import urllib.parse
 # Configuração do Banco de Dados
 DB_URL = "postgresql://neondb_owner:npg_rtgT9R3GEhAV@ep-snowy-dream-a5reiccc-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 
+def criar_tabela_se_nao_existir():
+    try:
+        conn = psycopg2.connect(DB_URL)
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS relatos (
+                id SERIAL PRIMARY KEY,
+                nome VARCHAR(150) NOT NULL,
+                email VARCHAR(150),
+                materia VARCHAR(100) NOT NULL,
+                nivel VARCHAR(50) NOT NULL,
+                detalhes TEXT NOT NULL,
+                status VARCHAR(50) DEFAULT 'Pendente',
+                data_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        messagebox.showerror("Erro de Conexão", f"Não foi possível criar a tabela no Neon:\n{e}")
+
 def carregar_dados():
     # Limpa a tabela antes de atualizar
     for item in tabela.get_children():
@@ -25,7 +47,7 @@ def carregar_dados():
         cursor.close()
         conn.close()
     except Exception as e:
-        messagebox.showerror("Erro de Conexão", f"Não foi possível conectar ao Neon:\n{e}")
+        messagebox.showerror("Erro de Conexão", f"Não foi possível buscar os dados no Neon:\n{e}")
 
 def marcar_resolvido():
     selecionado = tabela.selection()
@@ -35,14 +57,17 @@ def marcar_resolvido():
         
     id_relato = tabela.item(selecionado[0])['values'][0]
     
-    conn = psycopg2.connect(DB_URL)
-    cursor = conn.cursor()
-    cursor.execute("UPDATE relatos SET status = 'Resolvido' WHERE id = %s", (id_relato,))
-    conn.commit()
-    conn.close()
-    
-    carregar_dados()
-    messagebox.showinfo("Sucesso", "Relato atualizado para Resolvido!")
+    try:
+        conn = psycopg2.connect(DB_URL)
+        cursor = conn.cursor()
+        cursor.execute("UPDATE relatos SET status = 'Resolvido' WHERE id = %s", (id_relato,))
+        conn.commit()
+        conn.close()
+        
+        carregar_dados()
+        messagebox.showinfo("Sucesso", "Relato atualizado para Resolvido!")
+    except Exception as e:
+        messagebox.showerror("Erro", f"Falha ao atualizar o relato:\n{e}")
 
 def enviar_email():
     selecionado = tabela.selection()
@@ -68,6 +93,9 @@ janela.title("🏫 Painel Coordenação - ETEC MIND")
 janela.geometry("850x450")
 janela.configure(padx=15, pady=15)
 
+# Prepara o banco de dados ANTES de carregar a interface
+criar_tabela_se_nao_existir()
+
 tk.Label(janela, text="Sistema de Recebimento de Relatos", font=("Arial", 16, "bold")).pack(pady=5)
 
 # Tabela
@@ -89,7 +117,7 @@ tk.Button(frame_botoes, text="🔄 Atualizar Lista", command=carregar_dados, wid
 tk.Button(frame_botoes, text="✉️ Enviar E-mail", command=enviar_email, width=15, bg="#28a745", fg="white").pack(side=tk.LEFT, padx=10)
 tk.Button(frame_botoes, text="✔ Marcar Resolvido", command=marcar_resolvido, width=18, bg="#0056b3", fg="white").pack(side=tk.LEFT, padx=10)
 
-# Carrega os dados ao abrir o programa
+# Carrega os dados na tabela
 carregar_dados()
 
 # Mantém a janela aberta
