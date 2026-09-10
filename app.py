@@ -9,6 +9,30 @@ DB_URL = "postgresql://neondb_owner:npg_rtgT9R3GEhAV@ep-snowy-dream-a5reiccc-poo
 def conectar_banco():
     return psycopg2.connect(DB_URL)
 
+# ==========================================
+# FUNÇÃO PARA CRIAR A TABELA AUTOMATICAMENTE
+# ==========================================
+def criar_tabela():
+    conn = conectar_banco()
+    cursor = conn.cursor()
+    # O comando "IF NOT EXISTS" garante que ele só crie a tabela se ela ainda não existir
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS relatos (
+            id SERIAL PRIMARY KEY,
+            nome VARCHAR(150) NOT NULL,
+            email VARCHAR(150),
+            materia VARCHAR(100) NOT NULL,
+            nivel VARCHAR(50) NOT NULL,
+            detalhes TEXT NOT NULL,
+            status VARCHAR(50) DEFAULT 'Pendente',
+            data_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    """)
+    conn.commit()
+    cursor.close()
+    conn.close()
+    print("Banco de dados verificado/atualizado com sucesso!")
+
 # Rota 1: Entrega a tela do formulário do aluno
 @app.route('/')
 def aluno():
@@ -56,4 +80,6 @@ def resolver_relato(id_relato):
     return redirect('/coordenacao')
 
 if __name__ == '__main__':
+    # Roda a verificação do banco de dados antes de ligar o servidor
+    criar_tabela()
     app.run(debug=True)
