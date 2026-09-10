@@ -3,20 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatar Dificuldade - Aluno</title>
+    <title>ETEC MIND - Portal do Aluno</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f8; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { background: #fff; padding: 40px 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); width: 100%; max-width: 500px; text-align: center; }
+        .container { background: #fff; padding: 40px 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); width: 100%; max-width: 550px; text-align: center; }
+        
         .step { display: none; animation: fadeIn 0.4s ease; }
         .step.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
         h2 { color: #1a1a1a; margin-bottom: 10px; font-size: 24px; }
         p { color: #666; margin-bottom: 25px; font-size: 15px; }
+        
         form { text-align: left; }
         label { display: block; font-weight: 600; margin: 15px 0 5px; color: #444; }
         input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; background-color: #fafafa; }
         input:focus, select:focus, textarea:focus { border-color: #0056b3; outline: none; background: #fff;}
+        
         .btn-container { display: flex; flex-direction: column; gap: 10px; margin-top: 25px; }
         button { width: 100%; padding: 14px; background: #0056b3; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.2s; }
         button:hover { background: #004494; }
@@ -24,29 +28,67 @@
         button.btn-outline:hover { background: #f0f7ff; }
         button.btn-voltar { background: transparent; color: #888; font-size: 14px; padding: 10px; font-weight: normal; margin-top: 5px; }
         button.btn-voltar:hover { color: #333; text-decoration: underline; background: transparent; }
+        
+        /* Estilos específicos do Mural */
+        .mural-container { text-align: left; max-height: 400px; overflow-y: auto; padding-right: 10px; margin-bottom: 15px; }
+        .card-mural { background: #f8f9fa; border-left: 4px solid #0056b3; padding: 15px; border-radius: 6px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .card-mural h4 { margin-bottom: 8px; color: #0056b3; display: flex; justify-content: space-between; align-items: center; }
+        .badge { background: #e0e0e0; color: #333; font-size: 12px; padding: 3px 8px; border-radius: 12px; }
+        .card-mural p { margin-bottom: 15px; color: #444; font-size: 14px; }
+        .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #ddd; padding-top: 10px; }
+        .nome-pequeno { font-size: 11px; color: #888; font-style: italic; }
+        .btn-ajudar { background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-size: 13px; cursor: pointer; width: auto; font-weight: normal; }
+        .btn-ajudar:hover { background: #218838; }
+        .mural-container::-webkit-scrollbar { width: 6px; }
+        .mural-container::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 4px; }
     </style>
 </head>
 <body>
 
     <main class="container">
         
-        <div id="step-escolha" class="step active">
-            <h2>Como deseja participar?</h2>
-            <p>Você pode enviar sua dificuldade anonimamente ou se identificar para a coordenação.</p>
+        <!-- TELA 1: MENU PRINCIPAL -->
+        <div id="step-home" class="step active">
+            <h2>Portal ETEC MIND</h2>
+            <p>Escolha o que você deseja fazer hoje.</p>
             <div class="btn-container">
-                <button onclick="escolherModo(false)">Quero me identificar</button>
-                <button class="btn-outline" onclick="escolherModo(true)">Continuar anonimamente</button>
+                <button onclick="irParaTela('step-escolha')">📝 Relatar Dificuldade</button>
+                <button class="btn-outline" onclick="abrirMural()">🤝 Acessar Mural de Apoio</button>
             </div>
         </div>
 
+        <!-- TELA 2: MURAL DE APOIO -->
+        <div id="step-mural" class="step">
+            <h2>Mural de Apoio</h2>
+            <p>Veja as dificuldades dos colegas. Se alguém se identificou, você pode oferecer ajuda!</p>
+            
+            <div id="lista-mural" class="mural-container">
+                <p style="text-align:center; color:#888;">Carregando mural...</p>
+            </div>
+
+            <button class="btn-voltar" onclick="irParaTela('step-home')">Voltar ao Menu</button>
+        </div>
+
+        <!-- TELA 3: ESCOLHA DE PRIVACIDADE -->
+        <div id="step-escolha" class="step">
+            <h2>Como deseja relatar?</h2>
+            <p>Você pode enviar sua dificuldade anonimamente ou se identificar.</p>
+            <div class="btn-container">
+                <button onclick="escolherModo(false)">Quero me identificar (Aparece no Mural)</button>
+                <button class="btn-outline" onclick="escolherModo(true)">Continuar anonimamente</button>
+                <button class="btn-voltar" onclick="irParaTela('step-home')">Voltar ao Menu</button>
+            </div>
+        </div>
+
+        <!-- TELA 4: IDENTIFICAÇÃO -->
         <div id="step-identificacao" class="step">
             <h2>Sua Identificação</h2>
-            <p>Preencha seus dados para a coordenação saber quem você é.</p>
+            <p>Seus colegas poderão ver seu nome no mural e oferecer ajuda.</p>
             <div style="text-align: left;">
-                <label>Nome Completo</label>
+                <label>Nome Completo ou Apelido</label>
                 <input type="text" id="nome_aluno" placeholder="Digite seu nome">
-                <label>E-mail</label>
-                <input type="email" id="email_aluno" placeholder="Digite seu e-mail de contato">
+                <label>E-mail (Para receber ajuda)</label>
+                <input type="email" id="email_aluno" placeholder="Digite seu e-mail">
             </div>
             <div class="btn-container">
                 <button onclick="avancarParaRelato(false)">Continuar para o Relato</button>
@@ -54,12 +96,13 @@
             </div>
         </div>
 
+        <!-- TELA 5: ANÔNIMO -->
         <div id="step-anonimo" class="step">
             <h2>Modo Anônimo</h2>
-            <p>Seu nome não será revelado. Se quiser receber um retorno, deixe seu e-mail institucional (opcional).</p>
+            <p>Seu relato irá para a coordenação e para o mural, mas ninguém saberá que foi você.</p>
             <div style="text-align: left;">
-                <label>E-mail Institucional (Opcional)</label>
-                <input type="email" id="email_anonimo" placeholder="nome.sobrenome@etec.sp.gov.br">
+                <label>E-mail (Opcional - Exclusivo para a Coordenação)</label>
+                <input type="email" id="email_anonimo" placeholder="nome@etec.sp.gov.br">
             </div>
             <div class="btn-container">
                 <button onclick="avancarParaRelato(true)">Continuar para o Relato</button>
@@ -67,6 +110,7 @@
             </div>
         </div>
 
+        <!-- TELA 6: FORMULÁRIO DE RELATO -->
         <div id="step-relato" class="step">
             <h2>Detalhes da Dificuldade</h2>
             <p>Conte para nós o que está acontecendo.</p>
@@ -97,7 +141,7 @@
                 <textarea id="detalhes" rows="4" required placeholder="Explique sua dificuldade..."></textarea>
 
                 <div class="btn-container">
-                    <button type="submit" id="btn-enviar">Enviar para Coordenação</button>
+                    <button type="submit" id="btn-enviar">Enviar Relato</button>
                     <button type="button" class="btn-voltar" onclick="voltarDoRelato()">Voltar</button>
                 </div>
             </form>
@@ -108,6 +152,7 @@
     <script>
         let isAnonimo = true;
 
+        // Função para trocar de tela
         function irParaTela(telaId) {
             document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
             document.getElementById(telaId).classList.add('active');
@@ -130,7 +175,7 @@
                 const nome = document.getElementById('nome_aluno').value.trim();
                 const email = document.getElementById('email_aluno').value.trim();
                 if (nome === "" || email === "") {
-                    alert("Por favor, preencha seu nome e e-mail.");
+                    alert("Por favor, preencha seu nome e e-mail para se identificar.");
                     return;
                 }
             }
@@ -145,7 +190,62 @@
             }
         }
 
-        // COMUNICAÇÃO COM O PYTHON
+        // ==========================================
+        // LÓGICA DO MURAL DE APOIO
+        // ==========================================
+        function abrirMural() {
+            irParaTela('step-mural');
+            const listaMural = document.getElementById('lista-mural');
+            listaMural.innerHTML = '<p style="text-align:center; color:#888;">Buscando relatos no servidor...</p>';
+
+            // Busca os dados da rota /api/listar do Vercel
+            fetch('/api/listar')
+                .then(response => response.json())
+                .then(data => {
+                    listaMural.innerHTML = ''; // Limpa o aviso de carregando
+
+                    if(data.length === 0) {
+                        listaMural.innerHTML = '<p style="text-align:center; color:#888;">Nenhum relato no mural ainda. Seja o primeiro!</p>';
+                        return;
+                    }
+
+                    // Monta cada relato
+                    data.forEach(relato => {
+                        let card = `
+                            <div class="card-mural">
+                                <h4>${relato.materia} <span class="badge">${relato.nivel}</span></h4>
+                                <p>${relato.detalhes}</p>
+                        `;
+
+                        // Se a pessoa SE IDENTIFICOU, mostra o nome e o botão de ajudar
+                        if (relato.nome !== 'Anônimo' && relato.email && relato.email !== 'Não informado') {
+                            card += `
+                                <div class="card-footer">
+                                    <span class="nome-pequeno">Identificado: ${relato.nome}</span>
+                                    <button class="btn-ajudar" onclick="oferecerAjuda('${relato.nome}', '${relato.email}', '${relato.materia}')">🤝 Quero te ajudar</button>
+                                </div>
+                            `;
+                        }
+
+                        card += `</div>`;
+                        listaMural.innerHTML += card;
+                    });
+                })
+                .catch(error => {
+                    listaMural.innerHTML = '<p style="text-align:center; color:red;">Erro ao carregar o mural.</p>';
+                    console.error(error);
+                });
+        }
+
+        function oferecerAjuda(nomeColega, emailColega, materia) {
+            const assunto = `ETEC MIND - Quero te ajudar em ${materia}!`;
+            const mensagem = `Olá, ${nomeColega}!\n\nEu vi o seu relato no Mural do ETEC MIND sobre a matéria de ${materia} e gostaria de te ajudar com isso!\n\nVamos conversar?`;
+            window.location.href = `mailto:${emailColega}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(mensagem)}`;
+        }
+
+        // ==========================================
+        // LÓGICA PARA SALVAR O RELATO
+        // ==========================================
         function enviarParaCoordenacao(event) {
             event.preventDefault(); 
             const btnEnviar = document.getElementById('btn-enviar');
@@ -163,7 +263,7 @@
                 detalhes: document.getElementById('detalhes').value
             };
 
-            // Envia os dados para a rota /api/salvar do Python
+            // Envia para a rota /api/salvar no Vercel
             fetch('/api/salvar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -171,18 +271,18 @@
             })
             .then(response => response.json())
             .then(data => {
-                alert("Muito obrigado! Seu relato foi enviado para a coordenação.");
+                alert("Muito obrigado! Seu relato foi enviado com sucesso.");
                 document.getElementById('form-aluno').reset();
                 document.getElementById('nome_aluno').value = "";
                 document.getElementById('email_aluno').value = "";
                 document.getElementById('email_anonimo').value = "";
-                irParaTela('step-escolha');
+                irParaTela('step-home');
             })
             .catch(error => {
                 alert("Erro ao conectar com o servidor.");
             })
             .finally(() => {
-                btnEnviar.innerText = "Enviar para Coordenação";
+                btnEnviar.innerText = "Enviar Relato";
                 btnEnviar.disabled = false;
             });
         }
