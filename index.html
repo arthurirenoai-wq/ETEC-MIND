@@ -35,8 +35,11 @@
         .card-mural h4 { margin-bottom: 8px; color: #0056b3; display: flex; justify-content: space-between; align-items: center; }
         .badge { background: #e0e0e0; color: #333; font-size: 12px; padding: 3px 8px; border-radius: 12px; }
         .card-mural p { margin-bottom: 15px; color: #444; font-size: 14px; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #ddd; padding-top: 10px; flex-wrap: wrap; gap: 10px; }
-        .nome-pequeno { font-size: 11px; color: #888; font-style: italic; width: 100%; }
+        
+        /* Novo CSS do rodapé para alinhar os botões */
+        .card-footer { display: flex; justify-content: flex-start; align-items: center; border-top: 1px solid #ddd; padding-top: 12px; gap: 10px; }
+        .nome-pequeno { font-size: 12px; color: #888; font-style: italic; display: block; margin-bottom: 10px; }
+        
         .btn-ajudar { background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-size: 13px; cursor: pointer; width: auto; font-weight: normal; }
         .btn-ajudar:hover { background: #218838; }
         .mural-container::-webkit-scrollbar { width: 6px; }
@@ -55,7 +58,6 @@
 
     <main class="container">
         
-        <!-- TELA 1: MENU -->
         <div id="step-home" class="step active">
             <h2>Portal ETEC MIND</h2>
             <p>Escolha o que você deseja fazer hoje.</p>
@@ -65,7 +67,6 @@
             </div>
         </div>
 
-        <!-- TELA 2: MURAL -->
         <div id="step-mural" class="step">
             <h2>Mural de Apoio</h2>
             <p>Veja as dificuldades dos colegas e mostre que eles não estão sozinhos!</p>
@@ -90,7 +91,6 @@
             <button class="btn-voltar" onclick="irParaTela('step-home')">Voltar ao Menu</button>
         </div>
 
-        <!-- TELA 3: ESCOLHA -->
         <div id="step-escolha" class="step">
             <h2>Como deseja relatar?</h2>
             <p>Você pode enviar sua dificuldade anonimamente ou se identificar.</p>
@@ -101,7 +101,6 @@
             </div>
         </div>
 
-        <!-- TELA 4: IDENTIFICAÇÃO -->
         <div id="step-identificacao" class="step">
             <h2>Sua Identificação</h2>
             <p>Seus colegas poderão ver seu nome no mural e oferecer ajuda.</p>
@@ -117,7 +116,6 @@
             </div>
         </div>
 
-        <!-- TELA 5: ANÔNIMO -->
         <div id="step-anonimo" class="step">
             <h2>Modo Anônimo</h2>
             <p>Seu relato irá para a coordenação e para o mural, mas ninguém saberá que foi você.</p>
@@ -131,7 +129,6 @@
             </div>
         </div>
 
-        <!-- TELA 6: FORMULÁRIO -->
         <div id="step-relato" class="step">
             <h2>Detalhes da Dificuldade</h2>
             <p>Conte para nós o que está acontecendo.</p>
@@ -276,12 +273,18 @@
                             <div class="card-mural">
                                 <h4>${relato.materia} <span class="badge">${relato.nivel}</span></h4>
                                 <p>${relato.detalhes}</p>
-                                <div class="card-footer">
-                                    <button onclick="curtirRelato(${relato.id})" style="background:transparent; color:#dc3545; border:1px solid #dc3545; padding:5px 10px; border-radius:5px; font-size:13px; cursor:pointer; width:auto;">❤️ Eu também! (${curtidas})</button>
                         `;
                         
+                        // Movemos o nome de identificação para CIMA dos botões
                         if (relato.nome !== 'Anônimo' && relato.email && relato.email !== 'Não informado') {
                             card += `<span class="nome-pequeno">Identificado: ${relato.nome}</span>`;
+                        }
+                        
+                        // Agora os dois botões ficam na mesma linha organizados
+                        card += `<div class="card-footer">
+                                    <button onclick="curtirRelato(${relato.id})" style="background:transparent; color:#dc3545; border:1px solid #dc3545; padding:6px 12px; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold;">❤️ ${curtidas}</button>`;
+                        
+                        if (relato.nome !== 'Anônimo' && relato.email && relato.email !== 'Não informado') {
                             card += `<button class="btn-ajudar" onclick="oferecerAjuda('${relato.nome}', '${relato.email}', '${relato.materia}')">🤝 Quero te ajudar</button>`;
                         }
                         
