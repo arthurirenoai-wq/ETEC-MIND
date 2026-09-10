@@ -41,13 +41,22 @@
         .btn-ajudar:hover { background: #218838; }
         .mural-container::-webkit-scrollbar { width: 6px; }
         .mural-container::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 4px; }
+
+        /* ========================================== */
+        /* ESTILOS DA NOVA JANELINHA BONITA (MODAL)   */
+        /* ========================================== */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 9999; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease; }
+        .modal-icone { font-size: 45px; margin-bottom: 10px; }
+        .modal-content h3 { margin-bottom: 10px; font-size: 22px; }
+        .modal-content p { margin-bottom: 25px; font-size: 15px; color: #555; }
+        .modal-content button { width: auto; padding: 12px 30px; }
     </style>
 </head>
 <body>
 
     <main class="container">
         
-        <!-- TELA 1: MENU PRINCIPAL -->
         <div id="step-home" class="step active">
             <h2>Portal ETEC MIND</h2>
             <p>Escolha o que você deseja fazer hoje.</p>
@@ -57,19 +66,13 @@
             </div>
         </div>
 
-        <!-- TELA 2: MURAL DE APOIO -->
         <div id="step-mural" class="step">
             <h2>Mural de Apoio</h2>
             <p>Veja as dificuldades dos colegas. Se alguém se identificou, você pode oferecer ajuda!</p>
-            
-            <div id="lista-mural" class="mural-container">
-                <p style="text-align:center; color:#888;">Carregando mural...</p>
-            </div>
-
+            <div id="lista-mural" class="mural-container"></div>
             <button class="btn-voltar" onclick="irParaTela('step-home')">Voltar ao Menu</button>
         </div>
 
-        <!-- TELA 3: ESCOLHA DE PRIVACIDADE -->
         <div id="step-escolha" class="step">
             <h2>Como deseja relatar?</h2>
             <p>Você pode enviar sua dificuldade anonimamente ou se identificar.</p>
@@ -80,7 +83,6 @@
             </div>
         </div>
 
-        <!-- TELA 4: IDENTIFICAÇÃO -->
         <div id="step-identificacao" class="step">
             <h2>Sua Identificação</h2>
             <p>Seus colegas poderão ver seu nome no mural e oferecer ajuda.</p>
@@ -96,7 +98,6 @@
             </div>
         </div>
 
-        <!-- TELA 5: ANÔNIMO -->
         <div id="step-anonimo" class="step">
             <h2>Modo Anônimo</h2>
             <p>Seu relato irá para a coordenação e para o mural, mas ninguém saberá que foi você.</p>
@@ -110,7 +111,6 @@
             </div>
         </div>
 
-        <!-- TELA 6: FORMULÁRIO DE RELATO -->
         <div id="step-relato" class="step">
             <h2>Detalhes da Dificuldade</h2>
             <p>Conte para nós o que está acontecendo.</p>
@@ -149,10 +149,21 @@
 
     </main>
 
+    <!-- ========================================== -->
+    <!-- ESTRUTURA HTML DO NOVO MODAL (ESCONDIDO)   -->
+    <!-- ========================================== -->
+    <div id="modal-customizado" class="modal-overlay">
+        <div class="modal-content">
+            <div id="modal-icone" class="modal-icone">✅</div>
+            <h3 id="modal-titulo">Sucesso</h3>
+            <p id="modal-mensagem">Mensagem aqui</p>
+            <button id="btn-fechar-modal" onclick="fecharModal()">OK</button>
+        </div>
+    </div>
+
     <script>
         let isAnonimo = true;
 
-        // Função para trocar de tela
         function irParaTela(telaId) {
             document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
             document.getElementById(telaId).classList.add('active');
@@ -170,12 +181,45 @@
             }
         }
 
+        // ==========================================
+        // FUNÇÕES DO NOVO MODAL
+        // ==========================================
+        function mostrarModal(titulo, mensagem, tipo) {
+            document.getElementById('modal-titulo').innerText = titulo;
+            document.getElementById('modal-mensagem').innerText = mensagem;
+            
+            const icone = document.getElementById('modal-icone');
+            const tituloElement = document.getElementById('modal-titulo');
+            const btn = document.getElementById('btn-fechar-modal');
+
+            if (tipo === 'sucesso') {
+                icone.innerText = '✅';
+                tituloElement.style.color = '#28a745';
+                btn.style.backgroundColor = '#28a745';
+            } else if (tipo === 'erro') {
+                icone.innerText = '❌';
+                tituloElement.style.color = '#dc3545';
+                btn.style.backgroundColor = '#dc3545';
+            } else {
+                icone.innerText = '⚠️';
+                tituloElement.style.color = '#ffc107';
+                btn.style.backgroundColor = '#ffc107';
+            }
+            
+            document.getElementById('modal-customizado').style.display = 'flex';
+        }
+
+        function fecharModal() {
+            document.getElementById('modal-customizado').style.display = 'none';
+        }
+
         function avancarParaRelato(modoAnonimo) {
             if (!modoAnonimo) {
                 const nome = document.getElementById('nome_aluno').value.trim();
                 const email = document.getElementById('email_aluno').value.trim();
                 if (nome === "" || email === "") {
-                    alert("Por favor, preencha seu nome e e-mail para se identificar.");
+                    // SUBSTITUÍDO O ALERT ANTIGO AQUI:
+                    mostrarModal("Atenção", "Por favor, preencha seu nome e e-mail para se identificar.", "aviso");
                     return;
                 }
             }
@@ -190,34 +234,26 @@
             }
         }
 
-        // ==========================================
-        // LÓGICA DO MURAL DE APOIO
-        // ==========================================
         function abrirMural() {
             irParaTela('step-mural');
             const listaMural = document.getElementById('lista-mural');
             listaMural.innerHTML = '<p style="text-align:center; color:#888;">Buscando relatos no servidor...</p>';
 
-            // Busca os dados da rota /api/listar do Vercel
             fetch('/api/listar')
                 .then(response => response.json())
                 .then(data => {
-                    listaMural.innerHTML = ''; // Limpa o aviso de carregando
-
+                    listaMural.innerHTML = '';
                     if(data.length === 0) {
                         listaMural.innerHTML = '<p style="text-align:center; color:#888;">Nenhum relato no mural ainda. Seja o primeiro!</p>';
                         return;
                     }
 
-                    // Monta cada relato
                     data.forEach(relato => {
                         let card = `
                             <div class="card-mural">
                                 <h4>${relato.materia} <span class="badge">${relato.nivel}</span></h4>
                                 <p>${relato.detalhes}</p>
                         `;
-
-                        // Se a pessoa SE IDENTIFICOU, mostra o nome e o botão de ajudar
                         if (relato.nome !== 'Anônimo' && relato.email && relato.email !== 'Não informado') {
                             card += `
                                 <div class="card-footer">
@@ -226,14 +262,12 @@
                                 </div>
                             `;
                         }
-
                         card += `</div>`;
                         listaMural.innerHTML += card;
                     });
                 })
                 .catch(error => {
                     listaMural.innerHTML = '<p style="text-align:center; color:red;">Erro ao carregar o mural.</p>';
-                    console.error(error);
                 });
         }
 
@@ -243,9 +277,6 @@
             window.location.href = `mailto:${emailColega}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(mensagem)}`;
         }
 
-        // ==========================================
-        // LÓGICA PARA SALVAR O RELATO
-        // ==========================================
         function enviarParaCoordenacao(event) {
             event.preventDefault(); 
             const btnEnviar = document.getElementById('btn-enviar');
@@ -263,7 +294,6 @@
                 detalhes: document.getElementById('detalhes').value
             };
 
-            // Envia para a rota /api/salvar no Vercel
             fetch('/api/salvar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -271,7 +301,9 @@
             })
             .then(response => response.json())
             .then(data => {
-                alert("Muito obrigado! Seu relato foi enviado com sucesso.");
+                // SUBSTITUÍDO O ALERT ANTIGO AQUI PELA TELA DE SUCESSO:
+                mostrarModal("Tudo certo!", "Muito obrigado! Seu relato foi enviado com sucesso.", "sucesso");
+                
                 document.getElementById('form-aluno').reset();
                 document.getElementById('nome_aluno').value = "";
                 document.getElementById('email_aluno').value = "";
@@ -279,7 +311,8 @@
                 irParaTela('step-home');
             })
             .catch(error => {
-                alert("Erro ao conectar com o servidor.");
+                // SUBSTITUÍDO O ALERT ANTIGO AQUI PELA TELA DE ERRO:
+                mostrarModal("Ops!", "Erro ao conectar com o servidor.", "erro");
             })
             .finally(() => {
                 btnEnviar.innerText = "Enviar Relato";
