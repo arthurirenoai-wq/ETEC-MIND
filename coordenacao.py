@@ -4,36 +4,21 @@ import urllib.parse
 import sys
 from streamlit.web import cli as stcli
 
-# 1. Configuração visual da página
 st.set_page_config(page_title="Painel ETEC MIND", page_icon="🏫", layout="centered")
 
-# ==========================================
-# TELINHA DE INFORMAÇÕES (Menu Lateral)
-# ==========================================
 with st.sidebar:
     st.title("📌 ETEC MIND")
     st.markdown("### Fextec ...")
-    st.info("""
-    **Bem-vindo ao ETEC MIND!**
-    
-    Este é o painel exclusivo da coordenação para acompanhamento das dificuldades dos alunos.
-    
-    - Ajude a melhorar nossos estudos.
-    - Compartilhe suas dificuldades.
-    - Transforme a educação!
-    """)
+    st.info("Bem-vindo ao painel exclusivo da coordenação para acompanhamento das dificuldades dos alunos.")
     st.divider()
-    st.markdown("🔒 *Ambiente restrito da Coordenação*")
+    st.markdown("🔒 *Ambiente restrito*")
 
-# Sua chave de acesso ao Neon
 DB_URL = "postgresql://neondb_owner:npg_rtgT9R3GEhAV@ep-snowy-dream-a5reiccc-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 
-# 2. Funções de Banco de Dados
 def conectar_banco():
     return psycopg2.connect(DB_URL)
 
 def criar_tabela_se_nao_existir():
-    """Cria a tabela no Neon automaticamente caso ela não exista."""
     conn = conectar_banco()
     cursor = conn.cursor()
     cursor.execute("""
@@ -52,70 +37,82 @@ def criar_tabela_se_nao_existir():
     cursor.close()
     conn.close()
 
-def carregar_relatos():
+def carregar_todos_relatos():
     conn = conectar_banco()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, nome, email, materia, nivel, detalhes, TO_CHAR(data_envio, 'DD/MM/YYYY HH24:MI') FROM relatos WHERE status = 'Pendente' ORDER BY data_envio DESC")
+    # Agora busca todos os relatos para você ver o histórico do que foi resolvido
+    cursor.execute("SELECT id, nome, email, materia, nivel, detalhes, status, TO_CHAR(data_envio, 'DD/MM/YYYY HH24:MI') FROM relatos ORDER BY data_envio DESC")
     linhas = cursor.fetchall()
     cursor.close()
     conn.close()
     return linhas
 
-def resolver_relato(id_relato):
+def atualizar_status(id_relato, novo_status):
     conn = conectar_banco()
     cursor = conn.cursor()
-    cursor.execute("UPDATE relatos SET status = 'Resolvido' WHERE id = %s", (id_relato,))
+    cursor.execute("UPDATE relatos SET status = %s WHERE id = %s", (novo_status, id_relato))
     conn.commit()
     cursor.close()
     conn.close()
     st.rerun()
 
-# Executa a verificação do banco de dados silenciosamente ao iniciar
 criar_tabela_se_nao_existir()
 
-# 3. Construção da Interface Principal
-st.title("🏫 Painel de Recebimento - Secretaria")
-st.markdown("**Sistema ETEC MIND** | Aguardando novos relatos em tempo real...")
+st.title("🏫 Painel de Recebimento")
+st.markdown("**Sistema ETEC MIND** | Clique em um relato para ver os detalhes.")
 st.divider()
 
-relatos = carregar_relatos()
+relatos = carregar_todos_relatos()
 
 if not relatos:
-    st.success("🎉 Parabéns! Nenhum relato pendente no momento.")
+    st.success("🎉 Nenhum relato foi recebido ainda.")
 else:
     for relato in relatos:
-        id_relato, nome, email, materia, nivel, detalhes, data = relato
+        id_relato, nome, email, materia, nivel, detalhes, status, data = relato
         
-        with st.container(border=True):
-            st.subheader(f"📚 {materia} - Dificuldade {nivel}")
+        nome_exibicao = f"Anônimo {id_relato}" if nome == "Anônimo" else nome
+        
+        # Identificação visual de status
+        if status == 'Resolvido':
+            icone_status = "✅ Resolvido"
+        elif status == 'Em andamento':
+            icone_status = "⏳ Em andamento"
+        else:
+            icone_status = "🚨 Pendente"
+
+        # A mágica do "mostrar brevemente": O Expander!
+        with st.expander(f"{icone_status} | 📚 {materia} - {nome_exibicao}"):
             
-            texto_email = f"({email})" if email and email != "Não informado" else ""
-            st.write(f"**Aluno:** {nome} {texto_email}")
-            st.write(f"**Data:** {data}")
+            texto_email = f"({email})" if email and email != "Não informado" else "(Sem e-mail)"
+            st.write(f"**Aluno:** {nome_exibicao} {texto_email}")
+            st.write(f"**Data:** {data} | **Dificuldade:** {nivel}")
             st.warning(detalhes)
             
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                if email and email != "Não informado":
-                    assunto = urllib.parse.quote(f"ETEC MIND - Retorno sobre seu relato de {materia}")
-                    saudacao = f"Olá, {nome}!" if nome != "Anônimo" else "Olá!"
-                    mensagem = urllib.parse.quote(f"{saudacao}\n\nA coordenação recebeu o seu relato. Gostaríamos de conversar com você para ajudar.")
+            # Trava a edição se já estiver resolvido
+            if status == 'Resolvido':
+                st.success("Este problema já foi solucionado e arquivado.")
+            else:
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    if status == 'Pendente':
+                        if st.button("🛠️ Iremos resolver seu problema", key=f"btn_andamento_{id_relato}"):
+                            atualizar_status(id_relato, 'Em andamento')
                     
-                    st.markdown(f"""
-                        <a href="mailto:{email}?subject={assunto}&body={mensagem}" 
-                           style="background-color:#28a745; color:white; padding:8px 15px; border-radius:5px; text-decoration:none; display:inline-block;">
-                           ✉️ Enviar E-mail
-                        </a>
-                        """, unsafe_allow_html=True)
-            
-            with col2:
-                if st.button("✔ Marcar como Resolvido", key=f"btn_{id_relato}", type="primary"):
-                    resolver_relato(id_relato)
+                    if email and email != "Não informado":
+                        assunto = urllib.parse.quote(f"ETEC MIND - Atualização do seu relato de {materia}")
+                        mensagem = urllib.parse.quote(f"Olá, {nome_exibicao}!\n\nA coordenação está analisando o seu relato e iremos resolver seu problema o mais rápido possível.")
+                        st.markdown(f"""
+                            <a href="mailto:{email}?subject={assunto}&body={mensagem}" 
+                               style="background-color:#0056b3; color:white; padding:8px 15px; border-radius:5px; text-decoration:none; display:inline-block; margin-top:5px;">
+                               ✉️ Avisar Aluno por E-mail
+                            </a>
+                            """, unsafe_allow_html=True)
+                
+                with col2:
+                    if st.button("✔ Marcar como Resolvido", key=f"btn_resolver_{id_relato}", type="primary"):
+                        atualizar_status(id_relato, 'Resolvido')
 
-# ==========================================
-# TRUQUE DEFINITIVO PARA RODAR PELO BOTÃO PLAY
-# ==========================================
 if __name__ == '__main__':
     if "streamlit" not in sys.argv[0].lower():
         sys.argv = ["streamlit", "run", sys.argv[0]]
