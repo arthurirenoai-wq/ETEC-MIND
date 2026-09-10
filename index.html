@@ -35,16 +35,14 @@
         .card-mural h4 { margin-bottom: 8px; color: #0056b3; display: flex; justify-content: space-between; align-items: center; }
         .badge { background: #e0e0e0; color: #333; font-size: 12px; padding: 3px 8px; border-radius: 12px; }
         .card-mural p { margin-bottom: 15px; color: #444; font-size: 14px; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #ddd; padding-top: 10px; }
-        .nome-pequeno { font-size: 11px; color: #888; font-style: italic; }
+        .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #ddd; padding-top: 10px; flex-wrap: wrap; gap: 10px; }
+        .nome-pequeno { font-size: 11px; color: #888; font-style: italic; width: 100%; }
         .btn-ajudar { background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-size: 13px; cursor: pointer; width: auto; font-weight: normal; }
         .btn-ajudar:hover { background: #218838; }
         .mural-container::-webkit-scrollbar { width: 6px; }
         .mural-container::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 4px; }
 
-        /* ========================================== */
-        /* ESTILOS DA NOVA JANELINHA BONITA (MODAL)   */
-        /* ========================================== */
+        /* Estilos do Modal */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 9999; }
         .modal-content { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease; }
         .modal-icone { font-size: 45px; margin-bottom: 10px; }
@@ -57,6 +55,7 @@
 
     <main class="container">
         
+        <!-- TELA 1: MENU -->
         <div id="step-home" class="step active">
             <h2>Portal ETEC MIND</h2>
             <p>Escolha o que você deseja fazer hoje.</p>
@@ -66,13 +65,32 @@
             </div>
         </div>
 
+        <!-- TELA 2: MURAL -->
         <div id="step-mural" class="step">
             <h2>Mural de Apoio</h2>
-            <p>Veja as dificuldades dos colegas. Se alguém se identificou, você pode oferecer ajuda!</p>
+            <p>Veja as dificuldades dos colegas e mostre que eles não estão sozinhos!</p>
+            
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label style="font-size: 14px; margin-bottom: 5px;">🔍 Filtrar por Matéria:</label>
+                <select id="filtro-materia" onchange="abrirMural()" style="padding: 8px;">
+                    <option value="Todas">Todas as Matérias</option>
+                    <option value="Matemática">Matemática</option>
+                    <option value="Português">Português</option>
+                    <option value="História">História</option>
+                    <option value="Geografia">Geografia</option>
+                    <option value="Biologia">Biologia</option>
+                    <option value="Física">Física</option>
+                    <option value="Química">Química</option>
+                    <option value="Inglês">Inglês</option>
+                    <option value="Desenvolvimento de Sistemas">Desenvolvimento de Sistemas</option>
+                </select>
+            </div>
+            
             <div id="lista-mural" class="mural-container"></div>
             <button class="btn-voltar" onclick="irParaTela('step-home')">Voltar ao Menu</button>
         </div>
 
+        <!-- TELA 3: ESCOLHA -->
         <div id="step-escolha" class="step">
             <h2>Como deseja relatar?</h2>
             <p>Você pode enviar sua dificuldade anonimamente ou se identificar.</p>
@@ -83,6 +101,7 @@
             </div>
         </div>
 
+        <!-- TELA 4: IDENTIFICAÇÃO -->
         <div id="step-identificacao" class="step">
             <h2>Sua Identificação</h2>
             <p>Seus colegas poderão ver seu nome no mural e oferecer ajuda.</p>
@@ -98,6 +117,7 @@
             </div>
         </div>
 
+        <!-- TELA 5: ANÔNIMO -->
         <div id="step-anonimo" class="step">
             <h2>Modo Anônimo</h2>
             <p>Seu relato irá para a coordenação e para o mural, mas ninguém saberá que foi você.</p>
@@ -111,6 +131,7 @@
             </div>
         </div>
 
+        <!-- TELA 6: FORMULÁRIO -->
         <div id="step-relato" class="step">
             <h2>Detalhes da Dificuldade</h2>
             <p>Conte para nós o que está acontecendo.</p>
@@ -149,9 +170,7 @@
 
     </main>
 
-    <!-- ========================================== -->
-    <!-- ESTRUTURA HTML DO NOVO MODAL (ESCONDIDO)   -->
-    <!-- ========================================== -->
+    <!-- MODAL CUSTOMIZADO -->
     <div id="modal-customizado" class="modal-overlay">
         <div class="modal-content">
             <div id="modal-icone" class="modal-icone">✅</div>
@@ -181,9 +200,6 @@
             }
         }
 
-        // ==========================================
-        // FUNÇÕES DO NOVO MODAL
-        // ==========================================
         function mostrarModal(titulo, mensagem, tipo) {
             document.getElementById('modal-titulo').innerText = titulo;
             document.getElementById('modal-mensagem').innerText = mensagem;
@@ -218,7 +234,6 @@
                 const nome = document.getElementById('nome_aluno').value.trim();
                 const email = document.getElementById('email_aluno').value.trim();
                 if (nome === "" || email === "") {
-                    // SUBSTITUÍDO O ALERT ANTIGO AQUI:
                     mostrarModal("Atenção", "Por favor, preencha seu nome e e-mail para se identificar.", "aviso");
                     return;
                 }
@@ -237,38 +252,54 @@
         function abrirMural() {
             irParaTela('step-mural');
             const listaMural = document.getElementById('lista-mural');
-            listaMural.innerHTML = '<p style="text-align:center; color:#888;">Buscando relatos no servidor...</p>';
+            const filtro = document.getElementById('filtro-materia').value;
+            listaMural.innerHTML = '<p style="text-align:center; color:#888;">Buscando relatos...</p>';
 
             fetch('/api/listar')
                 .then(response => response.json())
                 .then(data => {
                     listaMural.innerHTML = '';
-                    if(data.length === 0) {
-                        listaMural.innerHTML = '<p style="text-align:center; color:#888;">Nenhum relato no mural ainda. Seja o primeiro!</p>';
+                    
+                    let relatosFiltrados = data;
+                    if (filtro !== 'Todas') {
+                        relatosFiltrados = data.filter(r => r.materia === filtro);
+                    }
+
+                    if(relatosFiltrados.length === 0) {
+                        listaMural.innerHTML = '<p style="text-align:center; color:#888;">Nenhum relato encontrado.</p>';
                         return;
                     }
 
-                    data.forEach(relato => {
+                    relatosFiltrados.forEach(relato => {
+                        let curtidas = relato.curtidas || 0;
                         let card = `
                             <div class="card-mural">
                                 <h4>${relato.materia} <span class="badge">${relato.nivel}</span></h4>
                                 <p>${relato.detalhes}</p>
-                        `;
-                        if (relato.nome !== 'Anônimo' && relato.email && relato.email !== 'Não informado') {
-                            card += `
                                 <div class="card-footer">
-                                    <span class="nome-pequeno">Identificado: ${relato.nome}</span>
-                                    <button class="btn-ajudar" onclick="oferecerAjuda('${relato.nome}', '${relato.email}', '${relato.materia}')">🤝 Quero te ajudar</button>
-                                </div>
-                            `;
+                                    <button onclick="curtirRelato(${relato.id})" style="background:transparent; color:#dc3545; border:1px solid #dc3545; padding:5px 10px; border-radius:5px; font-size:13px; cursor:pointer; width:auto;">❤️ Eu também! (${curtidas})</button>
+                        `;
+                        
+                        if (relato.nome !== 'Anônimo' && relato.email && relato.email !== 'Não informado') {
+                            card += `<span class="nome-pequeno">Identificado: ${relato.nome}</span>`;
+                            card += `<button class="btn-ajudar" onclick="oferecerAjuda('${relato.nome}', '${relato.email}', '${relato.materia}')">🤝 Quero te ajudar</button>`;
                         }
-                        card += `</div>`;
+                        
+                        card += `</div></div>`;
                         listaMural.innerHTML += card;
                     });
                 })
                 .catch(error => {
                     listaMural.innerHTML = '<p style="text-align:center; color:red;">Erro ao carregar o mural.</p>';
                 });
+        }
+
+        function curtirRelato(id) {
+            fetch('/api/curtir', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_relato: id })
+            }).then(() => abrirMural()); 
         }
 
         function oferecerAjuda(nomeColega, emailColega, materia) {
@@ -301,9 +332,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                // SUBSTITUÍDO O ALERT ANTIGO AQUI PELA TELA DE SUCESSO:
                 mostrarModal("Tudo certo!", "Muito obrigado! Seu relato foi enviado com sucesso.", "sucesso");
-                
                 document.getElementById('form-aluno').reset();
                 document.getElementById('nome_aluno').value = "";
                 document.getElementById('email_aluno').value = "";
@@ -311,7 +340,6 @@
                 irParaTela('step-home');
             })
             .catch(error => {
-                // SUBSTITUÍDO O ALERT ANTIGO AQUI PELA TELA DE ERRO:
                 mostrarModal("Ops!", "Erro ao conectar com o servidor.", "erro");
             })
             .finally(() => {
