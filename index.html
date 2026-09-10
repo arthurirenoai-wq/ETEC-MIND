@@ -4,11 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ETEC MIND - Portal do Aluno</title>
+    
+    <!-- Fonte do Fextec e do Site -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f8; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { background: #fff; padding: 40px 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); width: 100%; max-width: 550px; text-align: center; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f8; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; overflow-x: hidden; }
         
+        /* ========================================== */
+        /* ESTILOS DA TELA DE CARREGAMENTO (FEXTEC)   */
+        /* ========================================== */
+        #intro-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #111; color: white; display: flex; justify-content: center; align-items: center; z-index: 10000; font-family: 'Orbitron', sans-serif; transition: opacity 0.8s ease, visibility 0.8s ease; }
+        .intro-container { text-align: center; }
+        .logo-fextec { font-size: 4rem; font-weight: 700; color: #00ffcc; text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc; margin-bottom: 20px; animation: glow 2s infinite alternate; }
+        .typing-text { font-size: 1.5rem; overflow: hidden; white-space: nowrap; border-right: .15em solid #00ffcc; margin: 0 auto; letter-spacing: .15em; animation: typing 1.5s steps(30, end), blink-caret .5s step-end infinite; }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc; }
+            to { text-shadow: 0 0 20px #00ffff, 0 0 30px #00ffff; }
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #00ffcc }
+        }
+
+        /* ========================================== */
+        /* ESTILOS DO PORTAL DO ALUNO                 */
+        /* ========================================== */
+        .container { background: #fff; padding: 40px 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); width: 100%; max-width: 550px; text-align: center; }
         .step { display: none; animation: fadeIn 0.4s ease; }
         .step.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -29,23 +57,20 @@
         button.btn-voltar { background: transparent; color: #888; font-size: 14px; padding: 10px; font-weight: normal; margin-top: 5px; }
         button.btn-voltar:hover { color: #333; text-decoration: underline; background: transparent; }
         
-        /* Estilos específicos do Mural */
+        /* Estilos do Mural */
         .mural-container { text-align: left; max-height: 400px; overflow-y: auto; padding-right: 10px; margin-bottom: 15px; }
         .card-mural { background: #f8f9fa; border-left: 4px solid #0056b3; padding: 15px; border-radius: 6px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .card-mural h4 { margin-bottom: 8px; color: #0056b3; display: flex; justify-content: space-between; align-items: center; }
         .badge { background: #e0e0e0; color: #333; font-size: 12px; padding: 3px 8px; border-radius: 12px; }
         .card-mural p { margin-bottom: 15px; color: #444; font-size: 14px; }
-        
-        /* Novo CSS do rodapé para alinhar os botões */
         .card-footer { display: flex; justify-content: flex-start; align-items: center; border-top: 1px solid #ddd; padding-top: 12px; gap: 10px; }
         .nome-pequeno { font-size: 12px; color: #888; font-style: italic; display: block; margin-bottom: 10px; }
-        
         .btn-ajudar { background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-size: 13px; cursor: pointer; width: auto; font-weight: normal; }
         .btn-ajudar:hover { background: #218838; }
         .mural-container::-webkit-scrollbar { width: 6px; }
         .mural-container::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 4px; }
 
-        /* Estilos do Modal */
+        /* Estilos do Modal de Sucesso */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 9999; }
         .modal-content { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease; }
         .modal-icone { font-size: 45px; margin-bottom: 10px; }
@@ -56,6 +81,21 @@
 </head>
 <body>
 
+    <!-- ========================================== -->
+    <!-- TELA DE CARREGAMENTO FEXTEC                -->
+    <!-- ========================================== -->
+    <div id="intro-screen">
+        <div class="intro-container">
+            <div class="logo-fextec">Fextec</div>
+            <div class="typing-text" id="text1">Innovation and creativity</div>
+            <div class="typing-text" id="text2" style="display: none;">Systems Development</div>
+            <div class="typing-text" id="text3" style="display: none;">Powered by Fextec</div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PORTAL DO ALUNO PRINCIPAL                  -->
+    <!-- ========================================== -->
     <main class="container">
         
         <div id="step-home" class="step active">
@@ -70,7 +110,6 @@
         <div id="step-mural" class="step">
             <h2>Mural de Apoio</h2>
             <p>Veja as dificuldades dos colegas e mostre que eles não estão sozinhos!</p>
-            
             <div style="margin-bottom: 15px; text-align: left;">
                 <label style="font-size: 14px; margin-bottom: 5px;">🔍 Filtrar por Matéria:</label>
                 <select id="filtro-materia" onchange="abrirMural()" style="padding: 8px;">
@@ -86,7 +125,6 @@
                     <option value="Desenvolvimento de Sistemas">Desenvolvimento de Sistemas</option>
                 </select>
             </div>
-            
             <div id="lista-mural" class="mural-container"></div>
             <button class="btn-voltar" onclick="irParaTela('step-home')">Voltar ao Menu</button>
         </div>
@@ -146,7 +184,6 @@
                     <option value="Inglês">Inglês</option>
                     <option value="Desenvolvimento de Sistemas">Desenvolvimento de Sistemas</option>
                 </select>
-
                 <label>Nível de Dificuldade</label>
                 <select id="nivel" required>
                     <option value="" disabled selected>Selecione...</option>
@@ -154,10 +191,8 @@
                     <option value="Média">Média</option>
                     <option value="Alta">Alta</option>
                 </select>
-
                 <label>Conte um pouco mais</label>
                 <textarea id="detalhes" rows="4" required placeholder="Explique sua dificuldade..."></textarea>
-
                 <div class="btn-container">
                     <button type="submit" id="btn-enviar">Enviar Relato</button>
                     <button type="button" class="btn-voltar" onclick="voltarDoRelato()">Voltar</button>
@@ -178,6 +213,34 @@
     </div>
 
     <script>
+        // ==========================================
+        // LÓGICA DA TELA DE CARREGAMENTO FEXTEC
+        // ==========================================
+        window.onload = function() {
+            // Troca os textos a cada 1.5 segundos
+            setTimeout(() => {
+                document.getElementById('text1').style.display = 'none';
+                document.getElementById('text2').style.display = 'block';
+            }, 1500);
+
+            setTimeout(() => {
+                document.getElementById('text2').style.display = 'none';
+                document.getElementById('text3').style.display = 'block';
+            }, 3000);
+
+            // Esconde a tela de carregamento após 5 segundos
+            setTimeout(() => {
+                const introScreen = document.getElementById('intro-screen');
+                introScreen.style.opacity = '0'; // Faz sumir suavemente
+                setTimeout(() => {
+                    introScreen.style.visibility = 'hidden'; // Remove completamente
+                }, 800);
+            }, 5000);
+        };
+
+        // ==========================================
+        // LÓGICA DO PORTAL (MURAL E FORMULÁRIO)
+        // ==========================================
         let isAnonimo = true;
 
         function irParaTela(telaId) {
@@ -200,7 +263,6 @@
         function mostrarModal(titulo, mensagem, tipo) {
             document.getElementById('modal-titulo').innerText = titulo;
             document.getElementById('modal-mensagem').innerText = mensagem;
-            
             const icone = document.getElementById('modal-icone');
             const tituloElement = document.getElementById('modal-titulo');
             const btn = document.getElementById('btn-fechar-modal');
@@ -218,7 +280,6 @@
                 tituloElement.style.color = '#ffc107';
                 btn.style.backgroundColor = '#ffc107';
             }
-            
             document.getElementById('modal-customizado').style.display = 'flex';
         }
 
@@ -256,7 +317,6 @@
                 .then(response => response.json())
                 .then(data => {
                     listaMural.innerHTML = '';
-                    
                     let relatosFiltrados = data;
                     if (filtro !== 'Todas') {
                         relatosFiltrados = data.filter(r => r.materia === filtro);
@@ -275,12 +335,10 @@
                                 <p>${relato.detalhes}</p>
                         `;
                         
-                        // Movemos o nome de identificação para CIMA dos botões
                         if (relato.nome !== 'Anônimo' && relato.email && relato.email !== 'Não informado') {
                             card += `<span class="nome-pequeno">Identificado: ${relato.nome}</span>`;
                         }
                         
-                        // Agora os dois botões ficam na mesma linha organizados
                         card += `<div class="card-footer">
                                     <button onclick="curtirRelato(${relato.id})" style="background:transparent; color:#dc3545; border:1px solid #dc3545; padding:6px 12px; border-radius:5px; font-size:13px; cursor:pointer; font-weight:bold;">❤️ ${curtidas}</button>`;
                         
